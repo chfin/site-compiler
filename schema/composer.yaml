@@ -1,0 +1,9 @@
+template: composer
+include: person
+link: '<% @var name %>'
+keys:
+  pieces:
+    reverse: { schema: piece, key: composer }
+    link: true
+  id:
+    index: true

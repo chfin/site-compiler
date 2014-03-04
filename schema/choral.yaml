@@ -1,0 +1,5 @@
+template: choral
+include: piece
+link: '<% @var title %> (<% @var eg-number %>)'
+keys:
+  eg-number:
