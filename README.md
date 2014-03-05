@@ -27,7 +27,7 @@ Each of theses variables should be an absolute pathname designator to a default 
 eg. `"/home/chfin/data/default.yaml"`.
 Especially the file type (.yaml) should be given,
 since this will be the default file type for all files in this directory
-and can be omitted in document ids (see [References](#References)).
+and can be omitted in document ids (see [References](#references)).
 
 ## References
 
@@ -62,7 +62,7 @@ All exported symbols live in the `site-compiler` package.
 
 To compile the complete data directory, run:
 ```common-lisp
-SITE-COMPILER> (compile-all)`
+SITE-COMPILER> (compile-all)
 ```
 
 To compile a single file run
