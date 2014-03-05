@@ -1,12 +1,12 @@
 ;;;; util.lisp
 
-(defpackage pochopedia2.util
+(defpackage site-compiler.util
   (:use #:cl)
   (:export #:subfiles
            #:link-emb-name
            #:print-hash-table))
 
-(in-package #:pochopedia2.util)
+(in-package #:site-compiler.util)
 
 (defun subfiles (base defaults)
   (let ((n (length base)))

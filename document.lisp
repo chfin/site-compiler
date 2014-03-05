@@ -1,8 +1,8 @@
 ;;;; document.lisp
 
-(defpackage pochopedia2.document
-  (:use #:cl #:pochopedia2.config)
-  (:import-from #:pochopedia2.util
+(defpackage site-compiler.document
+  (:use #:cl #:site-compiler.config)
+  (:import-from #:site-compiler.util
                 #:subfiles
                 #:link-emb-name)
   (:import-from #:alexandria
@@ -20,7 +20,7 @@
            #:load-schema #:load-document
            #:document-pathnames #:schema-pathnames))
 
-(in-package #:pochopedia2.document)
+(in-package #:site-compiler.document)
 
 (defclass document ()
   ((contents :type hash-table
@@ -131,7 +131,7 @@
   (princ-to-string (make-pathname :type nil :defaults filename)))
 
 (defun name-to-url (name)
-  (concatenate 'string *entity-base-url* name ".html"))
+  (concatenate 'string *base-url* name ".html"))
 
 (defun calc-schema-indexed (schema-name includes keys)
   "=> index hash-table

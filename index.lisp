@@ -1,8 +1,8 @@
 ;;;; index.lisp
 
-(defpackage pochopedia2.index
-  (:use #:cl #:pochopedia2.config #:pochopedia2.document)
-  (:import-from #:pochopedia2.util
+(defpackage site-compiler.index
+  (:use #:cl #:site-compiler.config #:site-compiler.document)
+  (:import-from #:site-compiler.util
                 #:subfiles)
   (:import-from #:alexandria
                 #:hash-table-keys
@@ -14,7 +14,7 @@
            #:create-index
            #:index-get))
 
-(in-package #:pochopedia2.index)
+(in-package #:site-compiler.index)
 
 (defvar *index*)
 (defvar *schemas*)

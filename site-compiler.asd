@@ -1,8 +1,8 @@
-;;;; pochopedia2.asd
+;;;; site-compiler.asd
 
-(asdf:defsystem #:pochopedia2
+(asdf:defsystem #:site-compiler
   :serial t
-  :description "Describe pochopedia2 here"
+  :description "A static site compiler from yaml files using templates and schemas"
   :author "Christoph Finkensiep <chfin@freenet.de>"
   :license "MIT/X11"
   :depends-on (#:ningle
@@ -12,5 +12,5 @@
                (:file "config")
                (:file "document")
                (:file "index")
-               (:file "pochopedia2")))
+               (:file "site-compiler")))
 

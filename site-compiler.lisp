@@ -1,9 +1,9 @@
 ;;;; pochopedia2.lisp
 
-(defpackage #:pochopedia2
+(defpackage #:site-compiler
   (:nicknames #:pp2)
-  (:use #:cl #:pochopedia2.config #:pochopedia2.document)
-  (:import-from #:pochopedia2.index
+  (:use #:cl #:site-compiler.config #:site-compiler.document)
+  (:import-from #:site-compiler.index
                 #:index-get
                 #:create-index)
   (:import-from #:alexandria
@@ -11,9 +11,14 @@
                 #:when-let)
   (:export #:compile-yaml
            #:create-index
-           #:compile-all))
+           #:compile-all
+           #:*data-dir*
+           #:*schema-dir*
+           #:*template-dir*
+           #:*site-dir*
+           #:*base-url*))
 
-(in-package #:pochopedia2)
+(in-package #:site-compiler)
 
 ;;; use (file-write-date pathname) for compilation
 
@@ -72,7 +77,7 @@
             (cl-emb:*case-sensitivity* t))
         (alexandria:write-string-into-file
          (cl-emb:execute-emb tp-path :env document)
-         (merge-pathnames (pathname-name pathname) *static-dir*)
+         (merge-pathnames (pathname-name pathname) *site-dir*)
          :if-exists :supersede))
       nil)))
 

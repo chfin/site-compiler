@@ -1,17 +1,20 @@
 ;;;; config.lisp
 
-(defpackage pochopedia2.config
+(defpackage site-compiler.config
   (:use #:cl)
   (:export #:*data-dir*
-           #:*static-dir*
+           #:*site-dir*
            #:*template-dir*
            #:*schema-dir*
-           #:*entity-base-url*))
+           #:*base-url*))
 
-(in-package #:pochopedia2.config)
+(in-package #:site-compiler.config)
 
-(defparameter *data-dir* "/home/chfin/lisp/projects/pochopedia2/data/default.yaml")
-(defparameter *static-dir* "/home/chfin/lisp/projects/pochopedia2/static/default.html")
-(defparameter *template-dir* "/home/chfin/lisp/projects/pochopedia2/templates/default.tmpl")
-(defparameter *schema-dir* "/home/chfin/lisp/projects/pochopedia2/schema/default.yaml")
-(defparameter *entity-base-url* "")
+(defun rel-path (path)
+  (merge-pathnames path (asdf:system-source-directory :site-compiler)))
+
+(defparameter *data-dir* (rel-path "data/default.yaml"))
+(defparameter *site-dir* (rel-path "static/default.html"))
+(defparameter *template-dir* (rel-path "templates/default.tmpl"))
+(defparameter *schema-dir* (rel-path "schema/default.yaml"))
+(defparameter *base-url* "")
