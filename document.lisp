@@ -210,9 +210,10 @@ Loads a schema file and calculates :name and :indexed etc.."
          (doc (make-instance 'document :contents contents :schema schema :name name)))
     (setf (gethash ":name" contents) name)
     (setf (gethash ":url" contents) url)
-    (setf (gethash ":link" contents)
-          (format nil "<a href=\"~a\">~a</a>" url
-                  (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
+    (let ((link-text (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
+      (setf (gethash ":link-text" contents) link-text)
+      (setf (gethash ":link" contents)
+            (format nil "<a href=\"~a\">~a</a>" url link-text)))
     doc))
 
 (defun document-pathnames ()

@@ -77,7 +77,7 @@
             (cl-emb:*case-sensitivity* t))
         (alexandria:write-string-into-file
          (cl-emb:execute-emb tp-path :env document)
-         (merge-pathnames (pathname-name pathname) *site-dir*)
+         (ensure-directories-exist (merge-pathnames (document-name document) *site-dir*))
          :if-exists :supersede))
       nil)))
 
