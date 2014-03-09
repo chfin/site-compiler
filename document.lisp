@@ -4,7 +4,8 @@
   (:use #:cl #:site-compiler.config)
   (:import-from #:site-compiler.util
                 #:subfiles
-                #:link-emb-name)
+                #:link-emb-name
+                #:load-yaml)
   (:import-from #:alexandria
                 #:when-let
                 #:ensure-list
@@ -17,6 +18,7 @@
            #:schema-includes #:schema-indexed #:schema-links
            #:key-definition #:key-name #:key-link-p #:key-list-p
            #:key-index-p #:key-foreign #:key-reverse #:key-complex-p
+           #:key-markdown-p
            #:load-schema #:load-document
            #:document-pathnames #:schema-pathnames))
 
@@ -101,7 +103,11 @@
    (reverse :type (or cons null)
             :initarg :reverse
             :initform nil
-            :reader key-reverse)))
+            :reader key-reverse)
+   (markdown :type boolean
+             :initarg :markdown
+             :initform nil
+             :reader key-markdown-p)))
 
 (defmethod print-object ((object key-definition) stream)
   (print-unreadable-object (object stream :type t)
@@ -119,7 +125,8 @@
                      :foreign (gethash "foreign" key-ht)
                      :reverse (when-let ((rev (gethash "reverse" key-ht)))
                                 (cons (gethash "schema" rev)
-                                      (gethash "key" rev))))
+                                      (gethash "key" rev)))
+                     :markdown (gethash "markdown" key-ht))
       (make-instance 'key-definition :name key-name)))
 
 (defun key-complex-p (key)
@@ -183,8 +190,7 @@ in which they are indexed as values."
 (defun load-schema (filename)
   "=> a schema hash-table
 Loads a schema file and calculates :name and :indexed etc.."
-  (let* ((schema-path (merge-pathnames filename *schema-dir*))
-         (schema (cl-yy:yaml-simple-load (alexandria:read-file-into-string schema-path)))
+  (let* ((schema (load-yaml (merge-pathnames filename *schema-dir*)))
          (name (file-to-name filename))
          (includes (ensure-list (gethash "include" schema)))
          (direct-keys (calc-schema-keys schema))
@@ -202,8 +208,7 @@ Loads a schema file and calculates :name and :indexed etc.."
                    )))
 
 (defun load-document (filename)
-  (let* ((yaml-text (alexandria:read-file-into-string (merge-pathnames filename *data-dir*)))
-         (contents (cl-yy:yaml-simple-load yaml-text))
+  (let* ((contents (load-yaml (merge-pathnames filename *data-dir*)))
          (schema (load-schema (gethash "schema" contents "")))
          (name (file-to-name filename))
          (url (name-to-url name))

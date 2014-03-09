@@ -9,6 +9,10 @@
   (:import-from #:alexandria
                 #:hash-table-values
                 #:when-let)
+  (:import-from #:site-compiler.util
+                #:print-hash-table)
+  (:import-from #:cl-markdown
+                #:markdown)
   (:export #:compile-yaml
            #:create-index
            #:compile-all
@@ -36,16 +40,21 @@
     (resolve-document doc)
     doc))
 
-(defmethod cl-emb:getf* ((doc document) key &optional default)
-  
-  (let ((result (gethash (princ-to-string key) (document-contents doc) default)))
-    ;;(format t "getf*: ~s, ~s, ~s => ~s" doc key default result)
+(defmethod cl-emb:getf* ((doc document) key &optional default)  
+  (gethash (princ-to-string key) (document-contents doc) default))
+
+(defmethod cl-emb:getf* :around (thing key &optional default)
+  (let ((result (call-next-method)))
     (if (typep result 'lazy-document)
         (load-lazy-doc result)
         result)))
 
 (defun resolve-link (name)
   (gethash ":link" (document-contents (load-document name))))
+
+(defun process-markdown (text)
+  (print "Processing markdown")
+  (nth-value 1 (markdown text :stream nil)))
 
 (defun resolve-document (document)
   "modifies the document to resolve indirect keys"
@@ -62,11 +71,16 @@
          (setf key-val
                (if (key-list-p key) ;;resolve references
                    (mapcar #'resolve-id key-val)
-                   (resolve-id key-val))))
-       (setf (gethash (key-name key) (document-contents document))
-             (if (key-list-p key) ;;wrap, if list
-                 (mapcar #'wrap-this key-val)
-                 key-val))))))
+                   (resolve-id key-val)))))
+     (when (key-markdown-p key) ;;process markdown
+       (setf key-val
+             (if (key-list-p key)
+                 (mapcar #'process-markdown key-val)
+                 (process-markdown key-val))))
+     (setf (gethash (key-name key) (document-contents document))
+           (if (key-list-p key) ;;wrap, if list
+               (mapcar #'wrap-this key-val)
+               key-val)))))
 
 (defun compile-yaml (pathname)
   (let* ((document (load-document pathname))
