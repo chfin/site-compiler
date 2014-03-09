@@ -1,0 +1,10 @@
+<% @include header.tmpl %>
+<% @include person_base.tmpl %>
+<section>
+  <ul>
+    <% @loop books %>
+    <li><% @var this %></li>
+    <% @endloop %>
+  </ul>
+</section>
+<% @include footer.tmpl %>

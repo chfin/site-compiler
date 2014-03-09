@@ -1,8 +1,0 @@
-template: piece
-link: <% @var title %>
-keys:
-  composer:
-    foreign: composer
-    link: true
-    index: true
-  title:

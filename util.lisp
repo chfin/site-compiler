@@ -4,7 +4,8 @@
   (:use #:cl)
   (:export #:subfiles
            #:link-emb-name
-           #:print-hash-table))
+           #:print-hash-table
+           #:load-yaml))
 
 (in-package #:site-compiler.util)
 
@@ -16,6 +17,14 @@
                       :defaults path))
      (directory (make-pathname :directory (append base '(:wild-inferiors))
                                :defaults defaults)))))
+
+(defun ignore-warning (condition)
+  (declare (ignore condition))
+  (muffle-warning))
+
+(defun load-yaml (filename)
+  (handler-bind ((style-warning #'ignore-warning))
+    (cl-yaclyaml:yaml-simple-load (alexandria:read-file-into-string filename))))
 
 (defun link-emb-name (name)
   (format nil "link:~a" name))

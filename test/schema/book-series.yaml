@@ -1,0 +1,11 @@
+#book-series.yaml
+template: book-series
+link: '<% @var title %>'
+keys:
+  title:
+  books:
+    foreign: book
+    list: true
+  author:
+  publisher:
+  year:

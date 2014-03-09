@@ -1,0 +1,10 @@
+#book-to-buy.yaml
+template: book-to-buy
+includes: book
+link: '<% @var title %>'
+keys:
+  buy-links:
+    list: true
+  rating:
+  reviews:
+    list: true

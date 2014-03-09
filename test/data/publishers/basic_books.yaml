@@ -1,0 +1,6 @@
+#publishers/basic_books.yaml
+schema: publisher
+name: Basic Books
+year: 1952
+description: |
+  Basic Books is a book publisher founded in 1952 and located in New York. It publishes books in the fields of psychology, philosophy, economics, science, politics, sociology, current affairs, and history. Basic Books publishes new works in African and African-American studies under the Basic Civitas imprint.

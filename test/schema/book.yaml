@@ -1,0 +1,19 @@
+#book.yaml
+template: book
+link: <% @var title %>
+keys:
+  title:
+  subtitle:
+  author:
+    foreign: author
+    link: true
+    index: true
+  year:
+  publisher:
+    foreign: publisher
+    link: true
+    index: true
+  short-description:
+    markdown: true
+  summary:
+    markdown: true

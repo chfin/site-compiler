@@ -1,0 +1,32 @@
+#books/geb.yaml
+schema: book
+title: Gödel, Escher, Bach
+subtitle: An Eternal Golden Braid
+author: persons/d_hofstadter
+year: 1979
+publisher: publishers/basic_books
+short-description: |
+  By exploring common themes in the lives and works of logician Kurt Gödel,
+  artist M. C. Escher and composer Johann Sebastian Bach, GEB expounds concepts
+  fundamental to mathematics, symmetry, and intelligence. Through illustration
+  and analysis, the book discusses how self-reference and formal rules allow
+  systems to acquire meaning despite being made of "meaningless" elements. It
+  also discusses what it means to communicate, how knowledge can be represented
+  and stored, the methods and limitations of symbolic representation, and even
+  the fundamental notion of "meaning" itself.
+summary: |
+    ##Structure
+    
+    GEB takes the form of an interweaving of various narratives. The main chapters alternate with dialogues between imaginary characters, usually Achilles and the tortoise, first used by Zeno of Elea and later by Lewis Carroll in "What the Tortoise Said to Achilles". These origins are related in the first two dialogues, and later ones introduce new characters such as the Crab. These narratives frequently dip into self-reference and metafiction.
+    
+    Word play also features prominently in the work. Puns are occasionally used to connect ideas, such as "the Magnificrab, Indeed" with Bach's Magnificat in D; "SHRDLU, Toy of Man's Designing" with Bach's Jesu, Joy of Man's Desiring; and "Typographical Number Theory", or "TNT", which inevitably reacts explosively when it attempts to make statements about itself. One dialogue contains a story about a genie (from the Arabic "Djinn") and various "tonics" (of both the liquid and musical varieties), which is titled "Djinn and Tonic".
+    
+    One dialogue in the book is written in the form of a crab canon, in which every line before the midpoint corresponds to an identical line past the midpoint. The conversation still makes sense due to uses of common phrases that can be used as either greetings or farewells ("Good day") and the positioning of lines which double as an answer to a question in the next line. Another is a sloth canon, where one character repeats the lines of another, but slower and negated.
+    
+    ##Themes
+    
+    GEB contains many instances of recursion and self-reference, where objects and ideas speak about or refer back to themselves. For instance, there is a phonograph that destroys itself by playing a record titled "I Cannot Be Played on Record Player X" (an analogy to Gödel's incompleteness theorems), an examination of canon form in music, and a discussion of Escher's lithograph of two hands drawing each other. To describe such self-referencing objects, Hofstadter coins the term "strange loop", a concept he examines in more depth in his follow-up book I Am a Strange Loop. To escape many of the logical contradictions brought about by these self-referencing objects, Hofstadter discusses Zen koans. He attempts to show readers how to perceive reality outside their own experience and embrace such paradoxical questions by rejecting the premise—a strategy also called "unasking".
+    
+    Call stacks are also discussed in GEB, as one dialogue describes the adventures of Achilles and the Tortoise as they make use of "pushing potion" and "popping tonic" involving entering and leaving different layers of reality. Subsequent sections discuss the basic tenets of logic, self-referring statements, ("typeless") systems, and even programming.
+    
+    GEB was influenced by the books, Über formal unentscheidbare Sätze der Principia Mathematica und verwandter Systeme I, Minds, Machines and Gödel, Chance and Necessity and Zen Flesh, Zen Bones by Paul Reps.

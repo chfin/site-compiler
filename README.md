@@ -53,6 +53,7 @@ Keys can have these attributes:
 * link
 * list
 * index
+* markdown
 
 ## Usage
 
@@ -75,6 +76,10 @@ If you have reverse references, you have to create the index first:
 ```common-lisp
 SITE-COMPILER> (create-index)
 ```
+
+## Example
+
+For a detailed example have a look at the test directory.
 
 ## LICENSE
 

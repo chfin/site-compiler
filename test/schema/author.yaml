@@ -1,0 +1,8 @@
+#author.yaml
+template: author
+includes: person
+link: '<% @var name %>'
+keys:
+  books:
+    reverse: { schema: book, key: author }
+    link: true
