@@ -5,7 +5,8 @@
   (:import-from #:site-compiler.util
                 #:subfiles
                 #:link-emb-name
-                #:load-yaml)
+                #:load-yaml
+                #:print-hash-table)
   (:import-from #:alexandria
                 #:when-let
                 #:ensure-list
@@ -182,7 +183,7 @@ in which they are indexed as values."
 (defun merge-keys (keys includes)
   (let ((merged (copy-hash-table keys :test #'equal)))
     (dolist (super (mapcar #'load-schema includes))
-      (dolist  (s-key (hash-table-values (schema-keys super)))
+      (dolist (s-key (hash-table-values (schema-keys super)))
         (unless (gethash (key-name s-key) merged)
           (setf (gethash (key-name s-key) merged) s-key))))
     merged))

@@ -1,4 +1,4 @@
-;;;; pochopedia2.lisp
+;;;; site-compiler.lisp
 
 (defpackage #:site-compiler
   (:nicknames #:pp2)
@@ -53,7 +53,6 @@
   (gethash ":link" (document-contents (load-document name))))
 
 (defun process-markdown (text)
-  (print "Processing markdown")
   (nth-value 1 (markdown text :stream nil)))
 
 (defun resolve-document (document)
@@ -68,10 +67,11 @@
                 (if (key-link-p key)
                     (resolve-link name)
                     (make-instance 'lazy-document :name name))))
-         (setf key-val
-               (if (key-list-p key) ;;resolve references
-                   (mapcar #'resolve-id key-val)
-                   (resolve-id key-val)))))
+         (when key-val
+           (setf key-val
+                 (if (key-list-p key) ;;resolve references
+                     (mapcar #'resolve-id key-val)
+                     (resolve-id key-val))))))
      (when (key-markdown-p key) ;;process markdown
        (setf key-val
              (if (key-list-p key)
