@@ -8,6 +8,7 @@
                 #:create-index)
   (:import-from #:alexandria
                 #:hash-table-values
+                #:copy-hash-table
                 #:when-let)
   (:import-from #:site-compiler.util
                 #:print-hash-table)
@@ -24,7 +25,7 @@
 
 (in-package #:site-compiler)
 
-;;; use (file-write-date pathname) for compilation
+;;; use (file-write-date pathname) for caching
 
 (defun wrap-this (item)
   "=> `'(:|this| item)`"
@@ -53,10 +54,13 @@
   (gethash ":link" (document-contents (load-document name))))
 
 (defun process-markdown (text)
+  ;;(print "Processing markdown")
   (nth-value 1 (markdown text :stream nil)))
 
 (defun resolve-document (document)
   "modifies the document to resolve indirect keys"
+  (setf (document-contents document)
+        (copy-hash-table (document-raw-contents document)))
   (dolist (key (hash-table-values (schema-keys (document-schema document))))
     (let ((key-val (gethash (key-name key) (document-contents document))))
      (when (key-complex-p key)
@@ -98,7 +102,9 @@
 (defun docs-to-compile ()
   (document-pathnames))
 
-(defun compile-all ()
+(defun compile-all (&key clear-caches)
+  (when clear-caches
+    (clear-caches))
   (create-index)
   (let ((docs (docs-to-compile)))
     (mapcar #'compile-yaml docs))

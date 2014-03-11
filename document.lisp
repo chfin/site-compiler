@@ -14,27 +14,37 @@
                 #:hash-table-values
                 #:alist-hash-table
                 #:copy-hash-table)
-  (:export #:document #:document-contents #:document-schema #:document-name
+  (:export #:document #:document-contents #:document-schema
+           #:document-name #:document-raw-contents
            #:schema #:schema-name #:schema-template #:schema-keys
            #:schema-includes #:schema-indexed #:schema-links
            #:key-definition #:key-name #:key-link-p #:key-list-p
            #:key-index-p #:key-foreign #:key-reverse #:key-complex-p
            #:key-markdown-p
-           #:load-schema #:load-document
+           #:load-schema #:load-document #:clear-caches
            #:document-pathnames #:schema-pathnames))
 
 (in-package #:site-compiler.document)
 
+(defparameter *doc-cache* (make-hash-table :test 'equal))
+(defparameter *schema-cache* (make-hash-table :test 'equal))
+
 (defclass document ()
-  ((contents :type hash-table
+  ((raw-contents :type hash-table
+                 :initarg :raw-contents
+                 :reader document-raw-contents)
+   (contents :type hash-table
              :initarg :contents
-             :reader document-contents)
+             :accessor document-contents)
    (schema :type hash-table
            :initarg :schema
            :reader document-schema)
    (name :type string
          :initarg :name
-         :reader document-name)))
+         :reader document-name)
+   (resolved :type hash-table
+             :initform nil
+             :accessor document-resolved)))
 
 (defclass schema ()
   ((name :type string
@@ -188,39 +198,55 @@ in which they are indexed as values."
           (setf (gethash (key-name s-key) merged) s-key))))
     merged))
 
+(defmacro cache-lookup ((cache key full-path) &body create)
+  (alexandria:once-only (cache key full-path)
+    (alexandria:with-gensyms (c s)
+      `(let ((,c (gethash ,key ,cache)))
+         (if (and ,c (>= (car ,c) (file-write-date ,full-path)))
+             (cdr ,c)
+             (let ((,s (progn ,@create)))
+               (setf (gethash ,key ,cache)
+                     (cons (file-write-date ,full-path) ,s))
+               ,s))))))
+
 (defun load-schema (filename)
   "=> a schema hash-table
 Loads a schema file and calculates :name and :indexed etc.."
-  (let* ((schema (load-yaml (merge-pathnames filename *schema-dir*)))
-         (name (file-to-name filename))
-         (includes (ensure-list (gethash "include" schema)))
-         (direct-keys (calc-schema-keys schema))
-         (merged-keys (merge-keys direct-keys includes))
-         (cl-emb:*case-sensitivity* t))
-    (cl-emb:register-emb (link-emb-name name) (gethash "link" schema "<% @var :name %>"))
-    (make-instance 'schema
-                   :name name
-                   :template (gethash "template" schema)
-                   :direct-keys direct-keys
-                   :keys merged-keys
-                   :includes includes
-                   :indexed (calc-schema-indexed name includes direct-keys)
-                   ;;:links (calc-schema-links schema keys)
-                   )))
+  (let ((full-path (merge-pathnames filename *schema-dir*)))
+    (cache-lookup (*schema-cache* filename full-path)
+      ;;(format t "Loading Schema: ~a~%" filename)
+      (let* ((schema (load-yaml full-path))
+             (name (file-to-name filename))
+             (includes (ensure-list (gethash "include" schema)))
+             (direct-keys (calc-schema-keys schema))
+             (merged-keys (merge-keys direct-keys includes))
+             (cl-emb:*case-sensitivity* t))
+        (cl-emb:register-emb (link-emb-name name) (gethash "link" schema "<% @var :name %>"))
+        (make-instance 'schema
+                       :name name
+                       :template (gethash "template" schema)
+                       :direct-keys direct-keys
+                       :keys merged-keys
+                       :includes includes
+                       :indexed (calc-schema-indexed name includes direct-keys))))))
 
 (defun load-document (filename)
-  (let* ((contents (load-yaml (merge-pathnames filename *data-dir*)))
-         (schema (load-schema (gethash "schema" contents "")))
-         (name (file-to-name filename))
-         (url (name-to-url name))
-         (doc (make-instance 'document :contents contents :schema schema :name name)))
-    (setf (gethash ":name" contents) name)
-    (setf (gethash ":url" contents) url)
-    (let ((link-text (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
-      (setf (gethash ":link-text" contents) link-text)
-      (setf (gethash ":link" contents)
-            (format nil "<a href=\"~a\">~a</a>" url link-text)))
-    doc))
+  (let ((full-path (merge-pathnames filename *data-dir*)))
+    (cache-lookup (*doc-cache* filename full-path)
+      (format t "Loading Document: ~a~%" filename)
+      (let* ((contents (load-yaml full-path))
+             (schema (load-schema (gethash "schema" contents "")))
+             (name (file-to-name filename))
+             (url (name-to-url name))
+             (doc (make-instance 'document :raw-contents contents :contents contents
+                                 :schema schema :name name)))
+        (setf (gethash ":name" contents) name)
+        (setf (gethash ":url" contents) url)
+        (let ((link-text (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
+          (setf (gethash ":link-text" contents) link-text)
+          (setf (gethash ":link" contents)
+                (format nil "<a href=\"~a\">~a</a>" url link-text)))
+        doc))))
 
 (defun document-pathnames ()
   (subfiles (pathname-directory *data-dir*) "*.yaml"))
@@ -231,3 +257,7 @@ Loads a schema file and calculates :name and :indexed etc.."
 (defun key-link-p* (key schema)
   (when (gethash key (gethash :links schema))
     t))
+
+(defun clear-caches ()
+  (setf *doc-cache* (make-hash-table :test 'equal))
+  (setf *schema-cache* (make-hash-table :test 'equal)))

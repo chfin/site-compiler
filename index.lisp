@@ -50,10 +50,10 @@
     (maphash
      (lambda (i-key targets)
        (dolist (target targets)
-         (setf (gethash (gethash i-key (document-contents doc))
+         (setf (gethash (gethash i-key (document-raw-contents doc))
                         (gethash i-key (gethash target index)))
                (append
-                (gethash (gethash i-key (document-contents doc))
+                (gethash (gethash i-key (document-raw-contents doc))
                          (gethash i-key (gethash target index)))
                 (list (document-name doc))))))
      (schema-indexed (document-schema doc)))))

@@ -13,8 +13,10 @@
   (let ((n (length base)))
     (mapcar
      (lambda (path)
-       (make-pathname :directory (cons :relative (nthcdr n (pathname-directory path)))
-                      :defaults path))
+       (princ-to-string
+        (make-pathname :directory (cons :relative (nthcdr n (pathname-directory path)))
+                       :type nil
+                       :defaults path)))
      (directory (make-pathname :directory (append base '(:wild-inferiors))
                                :defaults defaults)))))
 
