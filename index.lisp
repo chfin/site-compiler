@@ -20,7 +20,7 @@
 (defvar *schemas*)
 
 (defun schema-to-index (schema)
-  (let ((keys (schema-keys schema)))
+  (let ((keys (schema-direct-keys schema)))
     (when-let ((indices ; find keys with 'index: true'
                 (remove-if-not (lambda (key)
                                  (let ((desc (gethash key keys)))

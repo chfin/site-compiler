@@ -18,6 +18,7 @@
            #:document-name #:document-raw-contents
            #:schema #:schema-name #:schema-template #:schema-keys
            #:schema-includes #:schema-indexed #:schema-links
+           #:schema-direct-keys
            #:key-definition #:key-name #:key-link-p #:key-list-p
            #:key-index-p #:key-foreign #:key-reverse #:key-complex-p
            #:key-markdown-p
