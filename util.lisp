@@ -5,7 +5,8 @@
   (:export #:subfiles
            #:link-emb-name
            #:print-hash-table
-           #:load-yaml))
+           #:load-yaml
+           #:load-yaml-from-string))
 
 (in-package #:site-compiler.util)
 
@@ -27,6 +28,10 @@
 (defun load-yaml (filename)
   (handler-bind ((style-warning #'ignore-warning))
     (cl-yaclyaml:yaml-simple-load (alexandria:read-file-into-string filename))))
+
+(defun load-yaml-from-string (string)
+  (handler-bind ((style-warning #'ignore-warning))
+    (cl-yaclyaml:yaml-simple-load string)))
 
 (defun link-emb-name (name)
   (format nil "link:~a" name))

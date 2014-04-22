@@ -6,6 +6,7 @@
                 #:subfiles
                 #:link-emb-name
                 #:load-yaml
+                #:load-yaml-from-string
                 #:print-hash-table)
   (:import-from #:alexandria
                 #:when-let
@@ -22,7 +23,7 @@
            #:key-definition #:key-name #:key-link-p #:key-list-p
            #:key-index-p #:key-foreign #:key-reverse #:key-complex-p
            #:key-markdown-p
-           #:load-schema #:load-document #:clear-caches
+           #:load-schema #:load-document #:load-document-from-string #:clear-caches
            #:document-pathnames #:schema-pathnames))
 
 (in-package #:site-compiler.document)
@@ -234,7 +235,7 @@ Loads a schema file and calculates :name and :indexed etc.."
 (defun load-document (filename)
   (let ((full-path (merge-pathnames filename *data-dir*)))
     (cache-lookup (*doc-cache* filename full-path)
-      (format t "Loading Document: ~a~%" filename)
+      ;;(format t "Loading Document: ~a~%" filename)
       (let* ((contents (load-yaml full-path))
              (schema (load-schema (gethash "schema" contents "")))
              (name (file-to-name filename))
@@ -248,6 +249,21 @@ Loads a schema file and calculates :name and :indexed etc.."
           (setf (gethash ":link" contents)
                 (format nil "<a href=\"~a\">~a</a>" url link-text)))
         doc))))
+
+(defun load-document-from-string (string name)
+  (let* ((contents (load-yaml-from-string string))
+         (schema (load-schema (gethash "schema" contents "")))
+         ;;(name (file-to-name filename))
+         (url (name-to-url name))
+         (doc (make-instance 'document :raw-contents contents :contents contents
+                             :schema schema :name name)))
+    (setf (gethash ":name" contents) name)
+    (setf (gethash ":url" contents) url)
+    (let ((link-text (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
+      (setf (gethash ":link-text" contents) link-text)
+      (setf (gethash ":link" contents)
+            (format nil "<a href=\"~a\">~a</a>" url link-text)))
+    doc))
 
 (defun document-pathnames ()
   (subfiles (pathname-directory *data-dir*) "*.yaml"))

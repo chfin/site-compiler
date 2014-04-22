@@ -15,6 +15,7 @@
   (:import-from #:cl-markdown
                 #:markdown)
   (:export #:compile-yaml
+           #:preview-yaml
            #:create-index
            #:compile-all
            #:*data-dir*
@@ -98,6 +99,16 @@
          (ensure-directories-exist (merge-pathnames (document-name document) *site-dir*))
          :if-exists :supersede))
       nil)))
+
+(defun preview-yaml (string doc-name)
+  (let* ((document (load-document-from-string string doc-name))
+         (template (schema-template (document-schema document))))
+    (when template
+      (resolve-document document)
+      (setf (gethash ":preview" (document-contents document)) t)
+      (let ((tp-path (merge-pathnames template *template-dir*))
+            (cl-emb:*case-sensitivity* t))
+        (cl-emb:execute-emb tp-path :env document)))))
 
 (defun docs-to-compile ()
   (document-pathnames))
