@@ -1,0 +1,20 @@
+<% @include header.tmpl %>
+    <h1><% @var name %></h1>
+    <p>
+      Since <% @var year %>
+    </p>
+    <h2>Description</h2>
+    <section>
+      <% @var description %>
+    </section>
+    <h2>Books</h2>
+    <ul>
+      <% @loop books %>
+      <li>
+        <% @with this %>
+        <% @var :link %> (<% @var year %>)
+        <% @endwith %>
+      </li>
+      <% @endloop %>
+    </ul>
+<% @include footer.tmpl %>

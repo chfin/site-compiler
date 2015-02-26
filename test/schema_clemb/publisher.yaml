@@ -1,0 +1,10 @@
+#publisher.yaml
+template: publisher
+link: '<% @var name %>'
+keys:
+  name:
+  year:
+  description:
+  books:
+    reverse: { schema: book, key: publisher }
+  

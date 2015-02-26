@@ -1,0 +1,10 @@
+#person.yaml
+template: person
+link: '<% @var name %>'
+keys:
+  name:
+  birth:
+  death:
+  wikipedia:
+  description:
+    markdown: true
