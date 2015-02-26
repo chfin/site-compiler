@@ -1,14 +1,16 @@
-<% @include header.tmpl %>
-    <h1><% @var title %></h1>
-    <% @if subtitle %><h2><% @var subtitle %></h2><% @endif %>
-    <p class="book-info">
-      By <% @var author %>, <% @var year %> (<% @var publisher %>)
-    </p>
-    <section class="book-short-description">
-      <% @var short-description %>
-    </section>
-    <section class="book-summary">
-      <h1>Summary</h1>
-      <% @var summary %>
-    </section>
-<% @include footer.tmpl %>
+{% extends "base.tmpl" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}
+<p class="book-info">
+  By {{ author }}, {{ year }} ({{ publisher }})
+</p>
+<section class="book-short-description">
+  {{ short-description }}
+</section>
+<section class="book-summary">
+  <h1>Summary</h1>
+  {{ summary }}
+</section>
+{% endblock %}

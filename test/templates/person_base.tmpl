@@ -1,12 +1,17 @@
-<h1><% @var name %></h1>
+{% extends "base.tmpl" %}
+
+{% block content %}
+<h1>{{ name }}</h1>
 <p>
-  (<% @if death %><% @var birth %> - <% @var death %><% @else %>* <% @var birth %><% @endif %>)
+  ({% if death %}{{ birth }} - {{ death }}{% else %}* {{ birth }}{% endif %})
 </p>
-<% @if wikipedia %>
+{% if wikipedia %}
 <p>
-  <a href="<% @var wikipedia %>">Wikipedia</a>
+  <a href="{{ wikipedia }}">Wikipedia</a>
 </p>
-<% @endif %>
+{% endif %}
 <section>
-  <% @var description %>
+  {{ description }}
 </section>
+{% block extra_content %}{% endblock %}
+{% endblock content %}

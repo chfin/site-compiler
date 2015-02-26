@@ -1,20 +1,20 @@
-<% @include header.tmpl %>
-    <h1><% @var name %></h1>
+{% extends "base.tmpl" %}
+
+{% block content %}
+    <h1>{{ name }}</h1>
     <p>
-      Since <% @var year %>
+      Since {{ year }}
     </p>
     <h2>Description</h2>
     <section>
-      <% @var description %>
+      {{ description }}
     </section>
     <h2>Books</h2>
     <ul>
-      <% @loop books %>
+      {% for book in books %}
       <li>
-        <% @with this %>
-        <% @var :link %> (<% @var year %>)
-        <% @endwith %>
+        {{ book._link }} ({{ book.year }})
       </li>
-      <% @endloop %>
+      {% endfor %}
     </ul>
-<% @include footer.tmpl %>
+{% endblock %}

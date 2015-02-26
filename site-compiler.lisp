@@ -51,8 +51,18 @@
         (load-lazy-doc result)
         result)))
 
+(defmethod access:do-access ((o document) k &key type test key skip-call?)
+  (declare (ignore type test key skip-call?))
+  (gethash (string-downcase (princ-to-string k)) (document-contents o)))
+
+(defmethod access:do-access :around (o k &key type test key skip-call?)
+  (let ((result (call-next-method)))
+    (if (typep result 'lazy-document)
+        (load-lazy-doc result)
+        result)))
+
 (defun resolve-link (name)
-  (gethash ":link" (document-contents (load-document name))))
+  (gethash "_link" (document-contents (load-document name))))
 
 (defun process-markdown (text)
   ;;(print "Processing markdown")
@@ -83,11 +93,11 @@
                  (mapcar #'process-markdown key-val)
                  (process-markdown key-val))))
      (setf (gethash (key-name key) (document-contents document))
-           (if (key-list-p key) ;;wrap, if list
-               (mapcar #'wrap-this key-val)
-               key-val)))))
+           key-val))))
 
-(defun compile-yaml (pathname)
+(defgeneric compile-yaml (name template-engine))
+
+(defmethod compile-yaml (pathname (template-engine (eql :cl-emb)))
   (let* ((document (load-document pathname))
          (template (schema-template (document-schema document))))
     (when template
@@ -100,12 +110,43 @@
          :if-exists :supersede))
       nil)))
 
+(defun doc-to-var-plist (document)
+  (let ((vars nil))
+    (maphash (lambda (k v)
+               (push (if (typep v 'lazy-document)
+                         (load-lazy-doc v)
+                         v)
+                     vars)
+               (push (alexandria:make-keyword k) vars))
+             (document-contents document))
+    vars))
+
+(defun render-document (document template stream)
+  (let ((djula:*auto-escape* nil))
+    (apply #'djula:render-template* template stream (doc-to-var-plist document))))
+
+(defmethod compile-yaml (pathname (template-engine (eql :djula)))
+  (let* ((document (load-document pathname))
+         (template (schema-template (document-schema document))))
+    (when template
+      (resolve-document document)
+      (let ((djula:*current-store* (make-instance 'djula:file-store))
+            (cl-emb:*case-sensitivity* t))
+        (djula:add-template-directory *template-dir*)
+        (with-open-file (stream
+                         (ensure-directories-exist
+                          (merge-pathnames (document-name document) *site-dir*))
+                         :direction :output
+                         :if-exists :supersede)
+          (render-document document template stream)))
+      nil)))
+
 (defun preview-yaml (string doc-name)
   (let* ((document (load-document-from-string string doc-name))
          (template (schema-template (document-schema document))))
     (when template
       (resolve-document document)
-      (setf (gethash ":preview" (document-contents document)) t)
+      (setf (gethash "_preview" (document-contents document)) t)
       (let ((tp-path (merge-pathnames template *template-dir*))
             (cl-emb:*case-sensitivity* t))
         (cl-emb:execute-emb tp-path :env document)))))
@@ -113,10 +154,10 @@
 (defun docs-to-compile ()
   (document-pathnames))
 
-(defun compile-all (&key clear-caches)
+(defun compile-all (&key clear-caches (template-engine :djula))
   (when clear-caches
     (clear-caches))
   (create-index)
   (let ((docs (docs-to-compile)))
-    (mapcar #'compile-yaml docs))
+    (mapcar (lambda (doc) (compile-yaml doc template-engine)) docs))
   nil)

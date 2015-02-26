@@ -8,10 +8,12 @@
   :depends-on (#:cl-yaclyaml
                #:cl-emb
                #:alexandria
-               #:cl-markdown)
+               #:cl-markdown
+               #:djula)
   :components ((:file "util")
                (:file "config")
                (:file "document")
                (:file "index")
+               (:file "render")
                (:file "site-compiler")))
 

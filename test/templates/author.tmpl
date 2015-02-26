@@ -1,10 +1,12 @@
-<% @include header.tmpl %>
-<% @include person_base.tmpl %>
+{% extends "person_base.tmpl" %}
+
+{% block extra_content %}
 <section>
+  <h2>Books</h2>
   <ul>
-    <% @loop books %>
-    <li><% @var this %></li>
-    <% @endloop %>
+    {% for book in books %}
+    <li>{{ book }}</li>
+    {% endfor %}
   </ul>
 </section>
-<% @include footer.tmpl %>
+{% endblock %}

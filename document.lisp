@@ -242,11 +242,11 @@ Loads a schema file and calculates :name and :indexed etc.."
              (url (name-to-url name))
              (doc (make-instance 'document :raw-contents contents :contents contents
                                  :schema schema :name name)))
-        (setf (gethash ":name" contents) name)
-        (setf (gethash ":url" contents) url)
+        (setf (gethash "_name" contents) name)
+        (setf (gethash "_url" contents) url)
         (let ((link-text (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
-          (setf (gethash ":link-text" contents) link-text)
-          (setf (gethash ":link" contents)
+          (setf (gethash "_link_text" contents) link-text)
+          (setf (gethash "_link" contents)
                 (format nil "<a href=\"~a\">~a</a>" url link-text)))
         doc))))
 
@@ -257,11 +257,11 @@ Loads a schema file and calculates :name and :indexed etc.."
          (url (name-to-url name))
          (doc (make-instance 'document :raw-contents contents :contents contents
                              :schema schema :name name)))
-    (setf (gethash ":name" contents) name)
-    (setf (gethash ":url" contents) url)
+    (setf (gethash "_name" contents) name)
+    (setf (gethash "_url" contents) url)
     (let ((link-text (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
-      (setf (gethash ":link-text" contents) link-text)
-      (setf (gethash ":link" contents)
+      (setf (gethash "_link_text" contents) link-text)
+      (setf (gethash "_link" contents)
             (format nil "<a href=\"~a\">~a</a>" url link-text)))
     doc))
 
