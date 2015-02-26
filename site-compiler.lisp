@@ -3,6 +3,8 @@
 (defpackage #:site-compiler
   (:nicknames #:pp2)
   (:use #:cl #:site-compiler.config #:site-compiler.document)
+  (:import-from #:site-compiler.render
+                #:*inline-template-engine*)
   (:import-from #:site-compiler.index
                 #:index-get
                 #:create-index)
@@ -95,10 +97,27 @@
      (setf (gethash (key-name key) (document-contents document))
            key-val))))
 
+(defun doc-to-var-plist (document)
+  "converts `document`'s contents to a plist with keywords as keys and loaded lazy documents"
+  (let ((vars nil))
+    (maphash (lambda (k v)
+               (push (if (typep v 'lazy-document)
+                         (load-lazy-doc v)
+                         v)
+                     vars)
+               (push (alexandria:make-keyword k) vars))
+             (document-contents document))
+    vars))
+
+(defun djula-render-document (document template stream)
+  (let ((djula:*auto-escape* nil))
+    (apply #'djula:render-template* template stream (doc-to-var-plist document))))
+
 (defgeneric compile-yaml (name template-engine))
 
 (defmethod compile-yaml (pathname (template-engine (eql :cl-emb)))
-  (let* ((document (load-document pathname))
+  (let* ((*inline-template-engine* :cl-emb)
+         (document (load-document pathname))
          (template (schema-template (document-schema document))))
     (when template
       (resolve-document document)
@@ -110,35 +129,20 @@
          :if-exists :supersede))
       nil)))
 
-(defun doc-to-var-plist (document)
-  (let ((vars nil))
-    (maphash (lambda (k v)
-               (push (if (typep v 'lazy-document)
-                         (load-lazy-doc v)
-                         v)
-                     vars)
-               (push (alexandria:make-keyword k) vars))
-             (document-contents document))
-    vars))
-
-(defun render-document (document template stream)
-  (let ((djula:*auto-escape* nil))
-    (apply #'djula:render-template* template stream (doc-to-var-plist document))))
-
 (defmethod compile-yaml (pathname (template-engine (eql :djula)))
-  (let* ((document (load-document pathname))
+  (let* ((*inline-template-engine* :djula)
+         (document (load-document pathname))
          (template (schema-template (document-schema document))))
     (when template
       (resolve-document document)
-      (let ((djula:*current-store* (make-instance 'djula:file-store))
-            (cl-emb:*case-sensitivity* t))
+      (let ((djula:*current-store* (make-instance 'djula:file-store)))
         (djula:add-template-directory *template-dir*)
         (with-open-file (stream
                          (ensure-directories-exist
                           (merge-pathnames (document-name document) *site-dir*))
                          :direction :output
                          :if-exists :supersede)
-          (render-document document template stream)))
+          (djula-render-document document template stream)))
       nil)))
 
 (defun preview-yaml (string doc-name)

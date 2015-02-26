@@ -1,6 +1,6 @@
 #publisher.yaml
 template: publisher
-link: '<% @var name %>'
+link: '{{ name }}'
 keys:
   name:
   year:

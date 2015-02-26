@@ -12,8 +12,8 @@
                #:djula)
   :components ((:file "util")
                (:file "config")
+               (:file "render")
                (:file "document")
                (:file "index")
-               (:file "render")
                (:file "site-compiler")))
 

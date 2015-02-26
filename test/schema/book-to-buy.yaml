@@ -1,7 +1,7 @@
 #book-to-buy.yaml
 template: book-to-buy
 includes: book
-link: '<% @var title %>'
+link: '{{ title }}'
 keys:
   buy-links:
     list: true

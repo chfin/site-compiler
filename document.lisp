@@ -8,6 +8,9 @@
                 #:load-yaml
                 #:load-yaml-from-string
                 #:print-hash-table)
+  (:import-from #:site-compiler.render
+                #:register-inline-template
+                #:render-inline-template)
   (:import-from #:alexandria
                 #:when-let
                 #:ensure-list
@@ -221,9 +224,8 @@ Loads a schema file and calculates :name and :indexed etc.."
              (name (file-to-name filename))
              (includes (ensure-list (gethash "include" schema)))
              (direct-keys (calc-schema-keys schema))
-             (merged-keys (merge-keys direct-keys includes))
-             (cl-emb:*case-sensitivity* t))
-        (cl-emb:register-emb (link-emb-name name) (gethash "link" schema "<% @var :name %>"))
+             (merged-keys (merge-keys direct-keys includes)))
+        (register-inline-template name (gethash "link" schema))
         (make-instance 'schema
                        :name name
                        :template (gethash "template" schema)
@@ -244,7 +246,7 @@ Loads a schema file and calculates :name and :indexed etc.."
                                  :schema schema :name name)))
         (setf (gethash "_name" contents) name)
         (setf (gethash "_url" contents) url)
-        (let ((link-text (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
+        (let ((link-text (render-inline-template (schema-name schema) doc)))
           (setf (gethash "_link_text" contents) link-text)
           (setf (gethash "_link" contents)
                 (format nil "<a href=\"~a\">~a</a>" url link-text)))
@@ -259,7 +261,7 @@ Loads a schema file and calculates :name and :indexed etc.."
                              :schema schema :name name)))
     (setf (gethash "_name" contents) name)
     (setf (gethash "_url" contents) url)
-    (let ((link-text (cl-emb:execute-emb (link-emb-name (schema-name schema)) :env doc)))
+    (let ((link-text (render-inline-template (schema-name schema) doc)))
       (setf (gethash "_link_text" contents) link-text)
       (setf (gethash "_link" contents)
             (format nil "<a href=\"~a\">~a</a>" url link-text)))

@@ -1,6 +1,6 @@
 #person.yaml
 template: person
-link: '<% @var name %>'
+link: '{{ name }}'
 keys:
   name:
   birth:

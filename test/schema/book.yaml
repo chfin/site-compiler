@@ -1,6 +1,6 @@
 #book.yaml
 template: book
-link: <% @var title %>
+link: '{{ title }}'
 keys:
   title:
   subtitle:
