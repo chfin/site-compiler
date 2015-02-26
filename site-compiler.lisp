@@ -145,8 +145,11 @@
           (djula-render-document document template stream)))
       nil)))
 
-(defun preview-yaml (string doc-name)
-  (let* ((document (load-document-from-string string doc-name))
+(defgeneric preview-yaml (string doc-name template-engine))
+
+(defmethod preview-yaml (string doc-name (template-engine (eql :cl-emb)))
+  (let* ((*inline-template-engine* :cl-emb)
+         (document (load-document-from-string string doc-name))
          (template (schema-template (document-schema document))))
     (when template
       (resolve-document document)
@@ -154,6 +157,18 @@
       (let ((tp-path (merge-pathnames template *template-dir*))
             (cl-emb:*case-sensitivity* t))
         (cl-emb:execute-emb tp-path :env document)))))
+
+(defmethod preview-yaml (string doc-name (template-engine (eql :djula)))
+  (let* ((*inline-template-engine* :djula)
+         (document (load-document-from-string string doc-name))
+         (template (schema-template (document-schema document))))
+    (when template
+      (resolve-document document)
+      (setf (gethash "_preview" (document-contents document)) t)
+      (let ((djula:*current-store* (make-instance 'djula:file-store)))
+        (djula:add-template-directory *template-dir*)
+        (with-output-to-string (stream)
+          (djula-render-document document template stream))))))
 
 (defun docs-to-compile ()
   (document-pathnames))
