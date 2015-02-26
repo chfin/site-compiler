@@ -9,8 +9,8 @@
                 #:load-yaml-from-string
                 #:print-hash-table)
   (:import-from #:site-compiler.render
-                #:register-inline-template
-                #:render-inline-template)
+                #:*inline-template-engine*
+                #:register-inline-template)
   (:import-from #:alexandria
                 #:when-let
                 #:ensure-list
@@ -280,3 +280,29 @@ Loads a schema file and calculates :name and :indexed etc.."
 (defun clear-caches ()
   (setf *doc-cache* (make-hash-table :test 'equal))
   (setf *schema-cache* (make-hash-table :test 'equal)))
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;;; rendering stuff ;;;
+;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun doc-to-keyword-list (document)
+  "converts `document`'s contents to a plist with keywords as keys"
+  (let ((vars nil))
+    (maphash (lambda (k v)
+               (push v vars)
+               (push (alexandria:make-keyword k) vars))
+             (site-compiler.document:document-contents document))
+    vars))
+
+(defun render-inline-template (name document)
+  "retrives the saved template using `name` and applies it to `document`"
+  (case *inline-template-engine*
+    (:cl-emb
+     (cl-emb:execute-emb (link-emb-name name) :env document))
+    (:djula
+     (with-output-to-string (stream)
+       (apply #'djula:render-template*
+              (gethash name site-compiler.render::*djula-inline-templates*
+                       site-compiler.render::+default-link-djula+)
+              stream
+              (doc-to-keyword-list document))))))
